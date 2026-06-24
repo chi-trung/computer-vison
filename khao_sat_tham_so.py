@@ -46,15 +46,16 @@ def khao_sat_gaussian_blur(anh, anh_xam_goc, mask_chuan=None):
 
         # Chạy Canny để thấy ảnh hưởng
         anh_canh = phat_hien_canh_canny(anh_xam_eq, 50, 150)
+        so_pixel_canh = np.sum(anh_canh > 0)
+
+        # Phân đoạn Otsu để đo
+        _, mask_otsu = phan_nguong_otsu(anh_xam_eq)
+        mask_cuoi = lam_sach_mask(mask_otsu)
+        so_pixel_fg = np.sum(mask_cuoi > 0)
 
         # Đánh giá nếu có ground truth
         iou = -1
         if mask_chuan is not None:
-            duong_vien = tim_duong_vien(anh_canh)
-            duong_vien = loc_duong_vien(duong_vien, 500)
-            bbox = lay_bounding_box(duong_vien)
-            _, mask_otsu = phan_nguong_otsu(anh_xam_eq)
-            mask_cuoi = lam_sach_mask(mask_otsu)
             kq = danh_gia_phan_doan(mask_cuoi, mask_chuan)
             iou = kq['IoU']
 
@@ -65,8 +66,8 @@ def khao_sat_gaussian_blur(anh, anh_xam_goc, mask_chuan=None):
             'iou': iou
         })
 
-        iou_str = f"IoU={iou:.4f}" if iou >= 0 else "N/A"
-        print(f"  Kernel ({k}x{k}): {iou_str}")
+        iou_str = f"IoU={iou:.4f}" if iou >= 0 else ""
+        print(f"  Kernel ({k}x{k}): {so_pixel_canh:6d} pixel canh | {so_pixel_fg:6d} pixel FG  {iou_str}")
 
     # Hiển thị so sánh
     print("\n  Nhan xet:")
@@ -136,6 +137,16 @@ def khao_sat_grabcut(anh, bbox, mask_chuan=None):
         print("  Khong co bounding box, bo qua khao sat GrabCut")
         return []
 
+    # Fix: kiểm tra bbox không quá lớn (GrabCut cần vùng BG đủ)
+    h, w = anh.shape[:2]
+    bx, by, bw, bh = bbox
+    ti_le_bbox = (bw * bh) / (w * h)
+    if ti_le_bbox > 0.9:
+        margin_x = int(w * 0.15)
+        margin_y = int(h * 0.15)
+        bbox = (margin_x, margin_y, w - 2 * margin_x, h - 2 * margin_y)
+        print(f"  BBox qua lon ({ti_le_bbox:.0%}), thu nho ve 70% vung giua")
+
     so_lap_list = [1, 3, 5, 10]
     ket_qua = []
 
@@ -186,8 +197,12 @@ def khao_sat_morphology(mask_tho, mask_chuan=None):
     kich_thuoc_list = [3, 5, 7, 9]
     ket_qua = []
 
+    so_pixel_goc = np.sum(mask_tho > 0)
+
     for k in kich_thuoc_list:
         mask_clean = lam_sach_mask(mask_tho, k)
+        so_pixel_fg = np.sum(mask_clean > 0)
+        thay_doi = so_pixel_fg - so_pixel_goc
 
         iou = -1
         if mask_chuan is not None:
@@ -200,8 +215,9 @@ def khao_sat_morphology(mask_tho, mask_chuan=None):
             'iou': iou
         })
 
-        iou_str = f"IoU={iou:.4f}" if iou >= 0 else "N/A"
-        print(f"  Kernel ({k}x{k}): {iou_str}")
+        iou_str = f"IoU={iou:.4f}" if iou >= 0 else ""
+        dau = "+" if thay_doi >= 0 else ""
+        print(f"  Kernel ({k}x{k}): {so_pixel_fg:6d} pixel FG ({dau}{thay_doi} pixel)  {iou_str}")
 
     print("\n  Nhan xet:")
     print("  - Kernel nho (3): it thay doi, chi xu ly nhieu rat nho")
