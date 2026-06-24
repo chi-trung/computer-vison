@@ -86,20 +86,24 @@ def xu_ly_mot_anh(duong_dan_anh, duong_dan_mask=None, thu_muc_ket_qua="ket_qua")
     print("\n[2] PHAT HIEN CANH (Ch.3)...")
     anh_canh = phat_hien_canh_canny(anh_xam_eq, nguong_thap=50, nguong_cao=150)
 
-    # Tìm và lọc đường viền
-    duong_vien = tim_duong_vien(anh_canh)
-    duong_vien = loc_duong_vien(duong_vien, dien_tich_toi_thieu=500, kich_thuoc_anh=anh.shape[:2])
+    # Tìm đường viền
+    duong_vien_tho = tim_duong_vien(anh_canh)
+    duong_vien = loc_duong_vien(duong_vien_tho, dien_tich_toi_thieu=500, kich_thuoc_anh=anh.shape[:2])
     print(f"  Canny: nguong = (50, 150)")
-    print(f"  Tim thay {len(duong_vien)} duong vien hop le")
+    print(f"  Tim thay {len(duong_vien_tho)} contour tho -> {len(duong_vien)} hop le")
 
-    # Vẽ đường viền lên ảnh
-    anh_duong_vien = ve_duong_vien(anh, duong_vien)
+    # Vẽ đường viền lên ảnh:
+    # 1) Tất cả contour THÔ → vàng mỏng (để thấy Canny phát hiện được gì)
+    # 2) Contour HỢP LỆ → xanh lá dày (tổn thương thực sự)
+    # 3) Bounding box → đỏ dày
+    anh_duong_vien = ve_duong_vien(anh, duong_vien_tho, mau=(0, 255, 255), do_day=1)
+    anh_duong_vien = ve_duong_vien(anh_duong_vien, duong_vien, mau=(0, 255, 0), do_day=3)
 
     # Lấy bounding box cho GrabCut
     bbox = lay_bounding_box(duong_vien)
     if bbox:
         x, y, w, h = bbox
-        cv2.rectangle(anh_duong_vien, (x, y), (x + w, y + h), (0, 0, 255), 2)
+        cv2.rectangle(anh_duong_vien, (x, y), (x + w, y + h), (0, 0, 255), 3)
         print(f"  Bounding box: x={x}, y={y}, w={w}, h={h}")
 
     # ========================================
