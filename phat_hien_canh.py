@@ -77,14 +77,19 @@ def tim_duong_vien(anh_nhi_phan):
 # ========================
 # LỌC ĐƯỜNG VIỀN THEO DIỆN TÍCH
 # ========================
-def loc_duong_vien(duong_vien_list, dien_tich_toi_thieu=500):
+def loc_duong_vien(duong_vien_list, dien_tich_toi_thieu=500, kich_thuoc_anh=None):
     """
-    Lọc bỏ các contour quá nhỏ (nhiễu).
+    Lọc bỏ các contour không phải tổn thương.
 
-    Lý do:
-    - Canny có thể tạo ra nhiều cạnh nhỏ do nhiễu
-    - Tổn thương da thường có diện tích đáng kể
-    - Lọc theo diện tích giúp giữ lại contour có ý nghĩa
+    Tiêu chí lọc:
+    1. Quá nhỏ (< dien_tich_toi_thieu): nhiễu
+    2. Quá lớn (> 80% ảnh): viền kính dermoscope
+    3. Chạm biên ảnh: viền kính dermoscope hoặc artifact
+
+    Lý do cần lọc viền kính:
+    - Ảnh dermoscopy thường có viền tròn đen (kính soi da)
+    - Canny phát hiện viền này → contour bao trùm cả ảnh
+    - BBox trùng toàn bộ ảnh → GrabCut thất bại
 
     Trả về: danh sách contour hợp lệ, sắp xếp theo diện tích giảm dần
     """
@@ -92,8 +97,34 @@ def loc_duong_vien(duong_vien_list, dien_tich_toi_thieu=500):
 
     for dv in duong_vien_list:
         dien_tich = cv2.contourArea(dv)
-        if dien_tich >= dien_tich_toi_thieu:
-            duong_vien_hop_le.append(dv)
+
+        # Lọc 1: quá nhỏ
+        if dien_tich < dien_tich_toi_thieu:
+            continue
+
+        # Lọc 2: quá lớn (> 80% diện tích ảnh)
+        if kich_thuoc_anh is not None:
+            h_anh, w_anh = kich_thuoc_anh
+            if dien_tich > 0.8 * h_anh * w_anh:
+                continue
+
+        # Lọc 3: chạm biên ảnh (viền kính dermoscope)
+        if kich_thuoc_anh is not None:
+            h_anh, w_anh = kich_thuoc_anh
+            x, y, w, h = cv2.boundingRect(dv)
+            margin = 5  # cho phép sai số 5 pixel
+
+            cham_trai = x <= margin
+            cham_phai = (x + w) >= (w_anh - margin)
+            cham_tren = y <= margin
+            cham_duoi = (y + h) >= (h_anh - margin)
+
+            # Nếu chạm 3+ cạnh → chắc chắn là viền kính
+            so_canh_cham = sum([cham_trai, cham_phai, cham_tren, cham_duoi])
+            if so_canh_cham >= 3:
+                continue
+
+        duong_vien_hop_le.append(dv)
 
     # Sắp xếp: contour lớn nhất lên đầu
     duong_vien_hop_le.sort(key=cv2.contourArea, reverse=True)
@@ -104,7 +135,7 @@ def loc_duong_vien(duong_vien_list, dien_tich_toi_thieu=500):
 # ========================
 # VẼ ĐƯỜNG VIỀN LÊN ẢNH
 # ========================
-def ve_duong_vien(anh, duong_vien_list, mau=(0, 255, 0), do_day=2):
+def ve_duong_vien(anh, duong_vien_list, mau=(0, 255, 0), do_day=3):
     """
     Vẽ các đường viền lên ảnh (tạo bản sao, KHÔNG sửa ảnh gốc).
 
@@ -167,7 +198,7 @@ if __name__ == "__main__":
 
     # Tìm và lọc đường viền
     duong_vien = tim_duong_vien(anh_canh)
-    duong_vien = loc_duong_vien(duong_vien, 500)
+    duong_vien = loc_duong_vien(duong_vien, 500, kich_thuoc_anh=anh.shape[:2])
     print(f"Tim thay {len(duong_vien)} duong vien hop le")
 
     # Vẽ đường viền

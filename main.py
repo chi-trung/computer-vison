@@ -77,7 +77,7 @@ def xu_ly_mot_anh(duong_dan_anh, duong_dan_mask=None, thu_muc_ket_qua="ket_qua")
     # BƯỚC 1: TIỀN XỬ LÝ (Ch.2)
     # ========================================
     print("\n[1] TIEN XU LY (Ch.2)...")
-    print("  Gaussian Blur (5x5) → Grayscale → CLAHE")
+    print("  Gaussian Blur (5x5) -> Grayscale -> CLAHE")
     anh_xam_eq, anh_mo = tien_xu_ly(anh)
 
     # ========================================
@@ -88,7 +88,7 @@ def xu_ly_mot_anh(duong_dan_anh, duong_dan_mask=None, thu_muc_ket_qua="ket_qua")
 
     # Tìm và lọc đường viền
     duong_vien = tim_duong_vien(anh_canh)
-    duong_vien = loc_duong_vien(duong_vien, dien_tich_toi_thieu=500)
+    duong_vien = loc_duong_vien(duong_vien, dien_tich_toi_thieu=500, kich_thuoc_anh=anh.shape[:2])
     print(f"  Canny: nguong = (50, 150)")
     print(f"  Tim thay {len(duong_vien)} duong vien hop le")
 
@@ -203,7 +203,7 @@ def xu_ly_nhieu_anh(thu_muc_anh, thu_muc_mask=None, thu_muc_ket_qua="ket_qua"):
             anh_xam_eq, anh_mo = tien_xu_ly(anh)
             anh_canh = phat_hien_canh_canny(anh_xam_eq, 50, 150)
             duong_vien = tim_duong_vien(anh_canh)
-            duong_vien = loc_duong_vien(duong_vien, 500)
+            duong_vien = loc_duong_vien(duong_vien, 500, kich_thuoc_anh=anh.shape[:2])
             bbox = lay_bounding_box(duong_vien)
 
             mask_otsu, mask_cuoi = phan_doan_ton_thuong(anh_mo, anh_xam_eq, bbox)

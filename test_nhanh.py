@@ -54,7 +54,7 @@ def test_pipeline():
     print("\n[2] PHAT HIEN CANH (Ch.3): Canny -> Contours -> BBox")
     anh_canh = phat_hien_canh_canny(anh_xam_eq, nguong_thap=50, nguong_cao=150)
     duong_vien = tim_duong_vien(anh_canh)
-    duong_vien = loc_duong_vien(duong_vien, dien_tich_toi_thieu=500)
+    duong_vien = loc_duong_vien(duong_vien, dien_tich_toi_thieu=500, kich_thuoc_anh=anh.shape[:2])
     print(f"    Canny: nguong = (50, 150)")
     print(f"    Tim thay {len(duong_vien)} duong vien hop le")
 

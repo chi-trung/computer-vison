@@ -259,7 +259,7 @@ def chay_khao_sat(duong_dan_anh, duong_dan_mask=None):
     # 3. Chuẩn bị cho GrabCut
     anh_canh = phat_hien_canh_canny(anh_xam_eq, 50, 150)
     duong_vien = tim_duong_vien(anh_canh)
-    duong_vien = loc_duong_vien(duong_vien, 500)
+    duong_vien = loc_duong_vien(duong_vien, 500, kich_thuoc_anh=anh.shape[:2])
     bbox = lay_bounding_box(duong_vien)
 
     # Khảo sát GrabCut
