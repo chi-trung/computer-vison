@@ -1,0 +1,40 @@
+# ========================
+# Du lieu (dataset lon, khong push)
+# ========================
+du_lieu/anh_goc/*
+du_lieu/mask_chuan/*
+
+# Giu lai anh mau (5-10 anh demo)
+!du_lieu/anh_goc/.gitkeep
+!du_lieu/mask_chuan/.gitkeep
+
+# ========================
+# Ket qua output
+# ========================
+ket_qua/
+
+# ========================
+# Mo hinh da train
+# ========================
+*.pkl
+
+# ========================
+# Python cache
+# ========================
+__pycache__/
+*.pyc
+*.pyo
+
+# ========================
+# IDE
+# ========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ========================
+# OS files
+# ========================
+Thumbs.db
+.DS_Store
