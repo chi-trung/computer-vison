@@ -8,7 +8,7 @@ tien_xu_ly.py - Module tiền xử lý ảnh (Chương 2)
 """
 
 import cv2
-import numpy as np
+
 
 
 # ========================
@@ -78,24 +78,6 @@ def can_bang_histogram_clahe(anh_xam, clip_limit=2.0, tile_size=(8, 8)):
     return clahe.apply(anh_xam)
 
 
-# ========================
-# CHUYỂN KHÔNG GIAN MÀU L*a*b* (Ch.2)
-# ========================
-def chuyen_lab(anh):
-    """
-    Chuyển ảnh BGR sang không gian màu L*a*b*.
-
-    Các kênh:
-    - L (Lightness): độ sáng, 0 (đen) → 100 (trắng)
-    - a: trục xanh lá (−) ↔ đỏ (+)
-    - b: trục xanh dương (−) ↔ vàng (+)
-
-    Ưu điểm cho phân đoạn da:
-    - Tách biệt thông tin MÀU SẮC (a, b) khỏi ĐỘ SÁNG (L)
-    - Ảnh da thường khác biệt rõ ở kênh a (đỏ) và b
-    """
-    return cv2.cvtColor(anh, cv2.COLOR_BGR2LAB)
-
 
 # ========================
 # PIPELINE TIỀN XỬ LÝ HOÀN CHỈNH
@@ -135,25 +117,3 @@ def tien_xu_ly(anh, kich_thuoc_kernel=(5, 5), clip_limit=2.0):
 
     return anh_xam_eq, anh_mo
 
-
-# ========================
-# TEST MODULE
-# ========================
-if __name__ == "__main__":
-    from tien_ich import doc_anh, resize_giu_ti_le
-
-    # Đọc ảnh test
-    anh = doc_anh("du_lieu/anh_goc/ISIC_0024306.jpg")
-    anh = resize_giu_ti_le(anh, 512)
-
-    # Chạy pipeline
-    anh_xam_eq, anh_mo = tien_xu_ly(anh)
-
-    # Hiển thị kết quả
-    cv2.imshow("1. Anh goc", anh)
-    cv2.imshow("2. Anh da lam mo (Gaussian)", anh_mo)
-    cv2.imshow("3. Anh xam + CLAHE", anh_xam_eq)
-
-    print("Nhan phim bat ky de dong...")
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()

@@ -8,7 +8,7 @@ phat_hien_canh.py - Module phát hiện cạnh (Chương 3)
 """
 
 import cv2
-import numpy as np
+
 
 
 # ========================
@@ -181,40 +181,3 @@ def lay_bounding_box(duong_vien_list, margin=10):
     return (x, y, w, h)
 
 
-# ========================
-# TEST MODULE
-# ========================
-if __name__ == "__main__":
-    from tien_ich import doc_anh, resize_giu_ti_le
-    from tien_xu_ly import tien_xu_ly
-
-    # Đọc và tiền xử lý
-    anh = doc_anh("du_lieu/anh_goc/ISIC_0024306.jpg")
-    anh = resize_giu_ti_le(anh, 512)
-    anh_xam_eq, _ = tien_xu_ly(anh)
-
-    # Phát hiện cạnh Canny
-    anh_canh = phat_hien_canh_canny(anh_xam_eq, 50, 150)
-
-    # Tìm và lọc đường viền
-    duong_vien = tim_duong_vien(anh_canh)
-    duong_vien = loc_duong_vien(duong_vien, 500, kich_thuoc_anh=anh.shape[:2])
-    print(f"Tim thay {len(duong_vien)} duong vien hop le")
-
-    # Vẽ đường viền
-    anh_vien = ve_duong_vien(anh, duong_vien)
-
-    # Lấy bounding box
-    bbox = lay_bounding_box(duong_vien)
-    if bbox:
-        x, y, w, h = bbox
-        cv2.rectangle(anh_vien, (x, y), (x + w, y + h), (0, 0, 255), 2)
-        print(f"Bounding box: x={x}, y={y}, w={w}, h={h}")
-
-    # Hiển thị
-    cv2.imshow("Anh goc", anh)
-    cv2.imshow("Canh Canny", anh_canh)
-    cv2.imshow("Duong vien + BBox", anh_vien)
-
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()

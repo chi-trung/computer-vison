@@ -6,7 +6,7 @@ Chạy: python test_nhanh.py
 
 import cv2
 import os
-import numpy as np
+
 
 from tien_ich import doc_anh, resize_giu_ti_le, luu_anh, tao_thu_muc, overlay_mask
 from tien_xu_ly import tien_xu_ly
@@ -107,4 +107,4 @@ def test_pipeline():
 
 
 if __name__ == "__main__":
-    test_nhanh = test_pipeline()
+    test_pipeline()

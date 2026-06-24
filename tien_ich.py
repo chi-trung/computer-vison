@@ -83,22 +83,6 @@ def tao_thu_muc(duong_dan):
         os.makedirs(duong_dan)
 
 
-# ========================
-# HIỂN THỊ NHIỀU ẢNH
-# ========================
-def hien_thi_anh(tieu_de_va_anh):
-    """
-    Hiển thị nhiều ảnh trên các cửa sổ riêng biệt.
-
-    Tham số:
-        tieu_de_va_anh: list các tuple (tieu_de, anh)
-        Ví dụ: [("Anh goc", img1), ("Canny", img2)]
-    """
-    for tieu_de, anh in tieu_de_va_anh:
-        cv2.imshow(tieu_de, anh)
-    print("Nhan phim bat ky de dong cua so...")
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
 
 
 # ========================

@@ -15,7 +15,7 @@ Ví dụ:
 import cv2
 import os
 import sys
-import numpy as np
+
 
 # Import các module trong project
 from tien_ich import doc_anh, doc_mask, resize_giu_ti_le, luu_anh, tao_thu_muc, overlay_mask

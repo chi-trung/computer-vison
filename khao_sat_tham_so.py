@@ -16,7 +16,7 @@ import cv2
 import os
 import numpy as np
 
-from tien_ich import doc_anh, doc_mask, resize_giu_ti_le, luu_anh, tao_thu_muc, overlay_mask
+from tien_ich import doc_anh, doc_mask, resize_giu_ti_le, luu_anh, tao_thu_muc
 from tien_xu_ly import lam_mo_gaussian, chuyen_xam, can_bang_histogram_clahe
 from phat_hien_canh import phat_hien_canh_canny, tim_duong_vien, loc_duong_vien, lay_bounding_box
 from phan_doan import phan_nguong_otsu, phan_doan_grabcut, lam_sach_mask

@@ -222,33 +222,3 @@ def phan_doan_ton_thuong(anh, anh_xam, bbox=None):
     return mask_otsu, mask_cuoi
 
 
-# ========================
-# TEST MODULE
-# ========================
-if __name__ == "__main__":
-    from tien_ich import doc_anh, resize_giu_ti_le
-    from tien_xu_ly import tien_xu_ly
-    from phat_hien_canh import phat_hien_canh_canny, tim_duong_vien, \
-        loc_duong_vien, lay_bounding_box
-
-    # Đọc và tiền xử lý
-    anh = doc_anh("du_lieu/anh_goc/ISIC_0024306.jpg")
-    anh = resize_giu_ti_le(anh, 512)
-    anh_xam_eq, anh_mo = tien_xu_ly(anh)
-
-    # Phát hiện cạnh → bounding box
-    anh_canh = phat_hien_canh_canny(anh_xam_eq, 50, 150)
-    duong_vien = tim_duong_vien(anh_canh)
-    duong_vien = loc_duong_vien(duong_vien, 500, kich_thuoc_anh=anh.shape[:2])
-    bbox = lay_bounding_box(duong_vien)
-
-    # Phân đoạn
-    mask_otsu, mask_cuoi = phan_doan_ton_thuong(anh_mo, anh_xam_eq, bbox)
-
-    # Hiển thị
-    cv2.imshow("Anh goc", anh)
-    cv2.imshow("Mask Otsu", mask_otsu)
-    cv2.imshow("Mask cuoi cung", mask_cuoi)
-
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
